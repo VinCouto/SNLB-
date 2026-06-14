@@ -1,9 +1,0 @@
---------------------------------------------------------------------------------
-CPU name:	AMD EPYC 7401 24-Core Processor
-CPU type:	AMD K17 (Zen) architecture
-CPU clock:	2.00 GHz
-Cannot gather values from unit register 0xC0010299, deactivating RAPL support
-ERROR - [./src/perfgroup.c:read_group:805] No such file or directory.
-Cannot read group file L3.txt. Searched in /home/soft/likwid/share/likwid/perfgroups/zen/L3.txt and /home/bcc/vsc24/.likwid/groups/zen/L3.txt
-ERROR - [./src/perfmon.c:perfmon_addEventSet:1737] No such file or directory.
-Access to performance group L3 not allowed
