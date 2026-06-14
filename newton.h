@@ -6,14 +6,7 @@
 
 /**
  * @brief Executa o Método de Newton para resolver o Sistema Não-Linear de Broyden.
- * * Esta função controla o laço iterativo principal. A cada iteração ela:
- * 1. Avalia o vetor F(X).
- * 2. Verifica os critérios de parada (max_iter e epsilon).
- * 3. Imprime o estado atual das incógnitas no formato exigido.
- * 4. Calcula a nova diagonal da matriz Jacobiana (computando o tempo).
- * 5. Resolve o sistema linear tridiagonal para achar dX (computando o tempo).
- * 6. Atualiza o vetor X (X = X + dX).
- * * @param n Dimensão do sistema.
+ * @param n Dimensão do sistema.
  * @param X Vetor de variáveis (aproximação inicial e saída da solução).
  * @param F Vetor auxiliar para armazenar F(X) e o passo dX.
  * @param diag_principal Vetor auxiliar para armazenar a diagonal da Jacobiana.

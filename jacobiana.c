@@ -23,9 +23,9 @@ void avalia_funcao(const real_t *restrict X, real_t *restrict F, int n) {
     }
 }
 
-// Atualiza apenas a diagonal principal da Jacobiana analítica
+//Atualiza apenas a diagonal principal da Jacobiana analítica
 void atualiza_diagonal_jacobiana(const real_t *restrict X, real_t *restrict diag_principal, int n) {
-    // J_ii = -4 * x_i + 3
+    //J_ii = -4 * x_i + 3
     //Loop simples, bom para prefetching de cache
     for (int i = 0; i < n; ++i) {
         diag_principal[i] = -4.0 * X[i] + 3.0;

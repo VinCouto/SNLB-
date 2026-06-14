@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Todos os tamanhos exigidos pelo seu enunciado original
 TAMANHOS=(32 64 128 256 512 1000 2000 4000 8000 9000 10000 20000)
 
 X0="1.0"
@@ -10,8 +9,7 @@ MAX_ITER="25"
 OUTPUT_DIR="./resultados_oficiais"
 mkdir -p "${OUTPUT_DIR}"
 
-# Ajustado os nomes dos grupos para casar perfeitamente com a CPU AMD Zen
-# L3 (substitui MEM se travado), CACHE (para Miss Ratio da L1) e FLOPS_DP (para MFLOP/s)
+#Nomes dos grupos da CPU AMD Zen
 GRUPOS_OFICIAIS="L3 CACHE FLOPS_DP"
 CPU=3
 
@@ -23,7 +21,6 @@ for grupo in $GRUPOS_OFICIAIS; do
     for N in "${TAMANHOS[@]}"; do
         LOG_FILE="${OUTPUT_DIR}/broyden_${grupo}_N${N}.txt"
         
-        # Passa os parâmetros via stdin padrão do seu executável ./broyden
         echo "$N $X0 $EPSILON $MAX_ITER" | \
         /home/soft/likwid/bin/likwid-perfctr -C ${CPU} -g "$grupo" -m ./broyden > "${LOG_FILE}" 2>&1
     done

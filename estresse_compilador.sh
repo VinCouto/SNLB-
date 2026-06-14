@@ -4,16 +4,13 @@ OUTPUT_DIR="./resultados_compilador"
 mkdir -p "${OUTPUT_DIR}"
 export LIKWID_HOME=/home/soft/likwid
 
-# Comparando tamanhos perfeitos vs. tamanhos que quebram a vetorização
-# 1000 e 2000 são múltiplos de 4 (perfeitos)
-# 1001 e 2003 são primos/ímpares (forçam o loop de limpeza)
+#Comparando tamanhos perfeitos e tamanhos que quebram a vetorização
 TAMANHOS="1000 1001 2000 2003"
 
 X0="1.0"
 EPSILON="0.0"
 MAX_ITER=25
 
-# Foco total nos FLOPS de Dupla Precisão
 GRUPO="FLOPS_DP"
 CPU=3
 
@@ -32,7 +29,7 @@ do
     
     if [ -f "${LOG_FILE}" ]; then
         TIME=$(grep "RDTSC Runtime" "${LOG_FILE}" | head -n 1 | awk -F'|' '{print $3}' | tr -d ' ')
-        # Puxa o AVX MFLOP/s assumido para ver a vazão dos registradores de 256-bit
+
         AVX_FLOPS=$(grep "DP MFLOP/s (AVX assumed)" "${LOG_FILE}" | head -n 1 | awk -F'|' '{print $3}' | tr -d ' ')
         
         echo "   Tempo total: ${TIME} s"

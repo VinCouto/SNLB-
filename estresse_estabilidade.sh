@@ -8,11 +8,11 @@ export LIKWID_HOME=/home/soft/likwid
 N=1000
 EPSILON="0.0"
 
-# Cenários de estresse: Pontos iniciais normais vs. Chutes absurdamente distantes
+#Cenários de estresse: Pontos iniciais normais e Chutes absurdamente distantes
 PONTOS_INICIAIS="1.0 10.0 100.0 1000.0 10000.0"
 MAX_ITER=25
 
-GRUPO="FLOPS_DP"  # Vamos monitorar os FLOPs para ver o esforço de cálculo
+GRUPO="FLOPS_DP"  
 CPU=3
 
 echo "=== INICIANDO TESTE DE ESTRESSE DE ESTABILIDADE (MAL CONDICIONAMENTO) ==="
@@ -23,14 +23,11 @@ for X0 in $PONTOS_INICIAIS
 do
     echo "=> Rodando com X0 = ${X0}..."
     
-    # Nome do arquivo de log usando o X0 como identificador
     LOG_FILE="${OUTPUT_DIR}/broyden_X0_${X0}.txt"
     
-    # Executa passando os parâmetros via stdin
     echo "$N $X0 $EPSILON $MAX_ITER" | \
     likwid-perfctr -C ${CPU} -g ${GRUPO} -m ./broyden > "${LOG_FILE}" 2>&1
     
-    # Extrai dados do resumo para a tela
     if [ -f "${LOG_FILE}" ]; then
         TIME=$(grep "RDTSC Runtime" "${LOG_FILE}" | head -n 1 | awk -F'|' '{print $3}' | tr -d ' ')
         FLOPS=$(grep "DP MFLOP/s" "${LOG_FILE}" | head -n 1 | awk -F'|' '{print $3}' | tr -d ' ')
