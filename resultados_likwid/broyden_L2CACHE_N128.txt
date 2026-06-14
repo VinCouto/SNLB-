@@ -1,4 +1,0 @@
---------------------------------------------------------------------------------
-CPU name:	AMD EPYC 7401 24-Core Processor
-CPU type:	AMD K17 (Zen) architecture
-CPU clock:	2.00 GHz
