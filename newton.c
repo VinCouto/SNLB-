@@ -12,18 +12,17 @@ int executa_newton(int n, real_t *restrict X, real_t *restrict F, real_t *restri
  
     LIKWID_MARKER_THREADINIT;
 
-    // Inicializa os acumuladores de tempo passados pelo main
+    //Inicializa os acumuladores de tempo passados pelo main
     *t_jacobiana = 0.0;
     *t_sl = 0.0;
 
     int iter = 0;
     
     while (iter < max_iter) {
-        // 1. Avalia a função não-linear F(X) no ponto atual X
+
         avalia_funcao(X, F, n);
 
-        // 2. IMPRESSÃO DAS INCÓGNITAS DA ITERAÇÃO ATUAL (Formato exigido pelo enunciado)
-        // Se for a iteração 0, imprime direto; se for depois, separa por '#'
+        //Se for a iteração 0, imprime direto; se for depois, separa por '#'
         if (iter > 0) {
             fprintf(saida, "#\n");
         }
@@ -31,8 +30,7 @@ int executa_newton(int n, real_t *restrict X, real_t *restrict F, real_t *restri
             fprintf(saida, "x%d = %.10g\n", i + 1, X[i]);
         }
 
-        // 3. CRITÉRIO DE PARADA: Verifica se a norma infinita (ou o maior elemento) de F(X) é < epsilon
-        // Como o enunciado pede epsilon = 0 para os testes de 25 iterações, isto serve para o caso geral
+        //Verifica se a norma infinita de F(X) é < epsilon
         real_t max_erro = 0.0;
         for (int i = 0; i < n; ++i) {
             real_t val_abs = ABS(F[i]);
@@ -44,7 +42,7 @@ int executa_newton(int n, real_t *restrict X, real_t *restrict F, real_t *restri
             break; 
         }
 
-        // 4. CÁLCULO DA MATRIZ JACOBIANA (INSTRUMENTADO)
+        //Calculo da Jacobiana
         LIKWID_MARKER_START("Jacobiana");
         double tempo_j_inicio = timestamp();
         
@@ -53,8 +51,8 @@ int executa_newton(int n, real_t *restrict X, real_t *restrict F, real_t *restri
         *t_jacobiana += (timestamp() - tempo_j_inicio);
         LIKWID_MARKER_STOP("Jacobiana");
 
-        // 5. RESOLUÇÃO DO SISTEMA LINEAR: J * dX = -F(X) (INSTRUMENTADO)
-        // Lembrando: resolve_sistema_tridiagonal altera o vetor F in-place, que vira dX
+        //Resolução do sistema linear J * dX = -F(X) (
+        //Altera o vetor F in-place, que vira dX
         LIKWID_MARKER_START("SistemaLinear");
         double tempo_sl_inicio = timestamp();
         
@@ -66,9 +64,8 @@ int executa_newton(int n, real_t *restrict X, real_t *restrict F, real_t *restri
         *t_sl += (timestamp() - tempo_sl_inicio);
         LIKWID_MARKER_STOP("SistemaLinear");
 
-        // 6. ATUALIZAÇÃO DO VETOR X: X^(k+1) = X^(k) + dX
-        // Como F agora guarda dX, fazemos X[i] += F[i]
-        // Loop simples perfeitamente vetorizável com AVX
+        //Atualização do vetor X^(k+1) = X^(k) + dX
+        //F agora guarda dX, fazemos X[i] += F[i]
         for (int i = 0; i < n; ++i) {
             X[i] += F[i];
         }

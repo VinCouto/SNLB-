@@ -4,12 +4,12 @@
 #include <unistd.h>
 #include <likwid.h>
 #include "utils.h"
-#include "jacobiana.h"     // Criaremos depois
-#include "sistema_linear.h" // Criaremos depois
-#include "newton.h"         // Criaremos depois
+#include "jacobiana.h"     
+#include "sistema_linear.h" 
+#include "newton.h"      
 
 int main(int argc, char *argv[]) {
-    // Inicializa o LIKWID (essencial para coletar métricas de CPU)
+ 
     LIKWID_MARKER_INIT;
 
     int n = 0;
@@ -18,8 +18,7 @@ int main(int argc, char *argv[]) {
     int max_iter = 0;
     char *arquivo_saida = NULL;
 
-    // 1. TRATAMENTO DE ARGUMENTOS DE LINHA DE COMANDO (-o)
-    // Usamos getopt (padrão POSIX) para detectar o parâmetro opcional
+    //Tratamento de argumentos
     int opt;
     while ((opt = getopt(argc, argv, "o:")) != -1) {
         switch (opt) {
@@ -32,7 +31,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // 2. LEITURA DOS PARÂMETROS DA ENTRADA PADRÃO (stdin)
     if (scanf("%d %lf %lf %d", &n, &x0, &epsilon, &max_iter) != 4) {
         fprintf(stderr, "Erro ao ler os parâmetros de entrada (N, x0, epsilon, MAX).\n");
         return 1;
@@ -48,13 +46,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // ========================================================================
-    // 3. ALOCAÇÃO DE MEMÓRIA (Otimizada para Cache e Vetorização)
-    // ========================================================================
-    /* Seu amigo usou malloc comum. Para garantir o melhor desempenho 
-       com AVX (-mavx) e evitar cache misses, usamos posix_memalign 
-       para alinhar os dados na memória (fronteiras de 64 bytes).
-    */
+
+    //Alocação de memoria alinhada para os vetores usados no método de Newton.
+    //Usamos posix_memalign para garantir alinhamento de 64 bytes
     real_t *X, *F, *diag_principal;
     
     if (posix_memalign((void**)&X, 64, n * sizeof(real_t)) != 0 ||
@@ -74,18 +68,12 @@ int main(int argc, char *argv[]) {
     double t_jacobiana = 0.0;
     double t_sl = 0.0;
 
-    // ========================================================================
-    // 4. CHAMADA DO MÉTODO DE NEWTON
-    // ========================================================================
-    
     // Adicionamos o marcador do LIKWID para o bloco inteiro do Newton
     LIKWID_MARKER_START("NewtonTotal");
     t_total = timestamp();
 
-    /* Aqui faremos a chamada da função que controlará o loop do Newton.
-       Passaremos os ponteiros de tempo para acumular o gasto interno 
-       com a Jacobiana e com o Solucionador Linear.
-    */   
+    //Passamos os ponteiros de tempo para acumular o gasto interno com a 
+    //Jacobiana e com o Solucionador Linear
     int status = executa_newton(n, X, F, diag_principal, epsilon, max_iter, saida, &t_jacobiana, &t_sl);
     
     if (status != 0) {
@@ -95,16 +83,14 @@ int main(int argc, char *argv[]) {
     t_total = timestamp() - t_total;
     LIKWID_MARKER_STOP("NewtonTotal");
 
-    // ========================================================================
-    // 5. IMPRESSÃO DO RODAPÉ DE MÉTRICAS (Conforme especificação)
-    // ========================================================================
+    //Impressão
     fprintf(saida, "###########\n");
     fprintf(saida, "# Tempo Total: %.10g\n", t_total);
     fprintf(saida, "# Tempo Jacobiana: %.10g\n", t_jacobiana);
     fprintf(saida, "# Tempo SL: %.10g\n", t_sl);
     fprintf(saida, "###########\n");
 
-    // Liberação de recursos
+    //Liberação de recursos
     free(X);
     free(F);
     free(diag_principal);
@@ -112,7 +98,6 @@ int main(int argc, char *argv[]) {
         fclose(saida);
     }
 
-    // Finaliza o LIKWID
     LIKWID_MARKER_CLOSE;
     return 0;
 }
